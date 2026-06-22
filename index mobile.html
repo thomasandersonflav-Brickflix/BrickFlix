@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BrickFlix — Louez les plus grands sets LEGO®</title>
+<meta name="description" content="BrickFlix vous permet de louer des sets LEGO® d'exception, de les construire chez vous, puis de les retourner une fois l'aventure terminée.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --navy-deep:#161B2E;
+    --navy-line:#2B3560;
+    --cream:#F7F2E7;
+    --paper:#FBF8F2;
+    --gold:#E8A33D;
+    --gold-light:#F4C879;
+    --brick:#C8443A;
+    --ink:#1A1D29;
+    --ink-soft:rgba(26,29,41,0.64);
+    --cream-soft:rgba(247,242,231,0.68);
+    --radius-sm:4px;
+    --radius-pill:999px;
+    --container:1180px;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;overflow-x:hidden;}
+  body{
+    margin:0;
+    overflow-x:hidden;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  section[id]{scroll-margin-top:84px;}
+  h1,h2,h3,h4{
+    font-family:'Bricolage Grotesque',system-ui,sans-serif;
+    margin:0;
+    line-height:1.08;
+    letter-spacing:-0.01em;
+  }
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;max-width:100%;}
+  ul{margin:0;padding:0;list-style:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:2px;}
+
+  .container{
+    max-width:var(--container);
+    margin:0 auto;
+    padding:0 24px;
+  }
+  section{padding:clamp(64px,9vw,120px) 0;}
+  .section-tight{padding-top:clamp(48px,7vw,84px);}
+
+  .eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--gold);
+    display:inline-block;
+    flex-shrink:0;
+  }
+  .eyebrow--dark{color:var(--gold-light);}
+
+  .stud{
+    display:inline-block;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:currentColor;
+    vertical-align:middle;
+  }
+
+  .text-gold{color:var(--gold);}
+  .text-soft{color:var(--ink-soft);}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:14px 26px;
+    border-radius:var(--radius-pill);
+    font-weight:600;
+    font-size:15px;
+    transition:transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+    white-space:nowrap;
+  }
+  .btn--gold{
+    background:var(--gold);
+    color:var(--ink);
+    box-shadow:0 2px 0 0 rgba(0,0,0,0.08);
+  }
+  .btn--gold:hover{
+    background:var(--gold-light);
+    transform:translateY(-2px);
+  }
+  .btn--ghost{
+    background:transparent;
+    color:var(--cream);
+    border:1.5px solid rgba(247,242,231,0.35);
+  }
+  .btn--ghost:hover{border-color:var(--cream);transform:translateY(-2px);}
+  .btn--dark{
+    background:var(--ink);
+    color:var(--cream);
+  }
+  .btn--dark:hover{background:var(--navy-deep);transform:translateY(-2px);}
+  .btn--sm{padding:10px 20px;font-size:13.5px;}
+  .btn--block{width:100%;}
+
+  /* ============ HEADER ============ */
+  .header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:100;
+    padding:18px 0;
+    padding-top:max(18px, env(safe-area-inset-top));
+    transition:background .3s var(--ease), padding .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .header.is-scrolled{
+    background:rgba(22,27,46,0.92);
+    backdrop-filter:blur(10px);
+    padding:12px 0;
+    padding-top:max(12px, env(safe-area-inset-top));
+    box-shadow:0 1px 0 rgba(247,242,231,0.08);
+  }
+  .header__inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+  }
+  .brand{
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-weight:700;
+    font-size:21px;
+    color:var(--cream);
+    display:flex;
+    align-items:baseline;
+  }
+  .brand__flix{color:var(--gold);position:relative;}
+  .brand__dot{
+    position:absolute;
+    top:-9px;right:-3px;
+    width:5px;height:5px;
+    border-radius:50%;
+    background:var(--gold);
+  }
+  .nav{
+    display:flex;
+    gap:32px;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--cream-soft);
+  }
+  .nav a{transition:color .2s;}
+  .nav a:hover{color:var(--gold-light);}
+  .header__cta{flex-shrink:0;}
+  .nav-toggle{
+    display:none;
+    width:44px;height:44px;
+    border-radius:50%;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+  }
+  .nav-toggle span,.nav-toggle span::before,.nav-toggle span::after{
+    content:'';
+    display:block;
+    width:18px;height:2px;
+    background:var(--cream);
+    transition:transform .25s, opacity .25s;
+  }
+  .nav-toggle span::before{transform:translateY(-6px);}
+  .nav-toggle span::after{transform:translateY(4px);}
+
+  .nav-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,18,30,0.55);
+    z-index:90;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s var(--ease);
+  }
+  .nav-backdrop.is-visible{opacity:1;pointer-events:auto;}
+
+  @media (max-width:860px){
+    .nav{
+      position:fixed;
+      top:0;right:0;
+      height:100vh;
+      width:min(78vw,320px);
+      background:var(--navy-deep);
+      flex-direction:column;
+      padding:100px 32px 32px;
+      padding-top:max(100px, env(safe-area-inset-top) + 70px);
+      padding-bottom:max(32px, env(safe-area-inset-bottom));
+      gap:26px;
+      font-size:17px;
+      transform:translateX(100%);
+      transition:transform .35s var(--ease);
+      box-shadow:-8px 0 30px rgba(0,0,0,0.25);
+      z-index:95;
+      overflow-y:auto;
+    }
+    .nav.is-open{transform:translateX(0);}
+    .nav a{padding:6px 0;display:block;}
+    .header__cta{display:none;}
+    .nav-toggle{display:flex;}
+  }
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative;
+    background:var(--navy-deep);
+    color:var(--cream);
+    padding-top:160px;
+    padding-bottom:90px;
+    overflow:hidden;
+  }
+  .hero__grid{
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(247,242,231,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(247,242,231,0.045) 1px, transparent 1px);
+    background-size:42px 42px;
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 88%);
+  }
+  .hero__inner{
+    position:relative;
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    gap:56px;
+    align-items:center;
+  }
+  .hero__title{
+    font-size:clamp(34px,4.6vw,56px);
+    font-weight:700;
+    color:var(--cream);
+    margin-bottom:22px;
+  }
+  .hero__sub{
+    max-width:480px;
+    color:var(--cream-soft);
+    font-size:17px;
+    margin-bottom:34px;
+  }
+  .hero__actions{display:flex;gap:14px;flex-wrap:wrap;}
+
+  .hero__posters{
+    position:relative;
+    height:380px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .mini-poster{
+    position:absolute;
+    width:158px;
+    aspect-ratio:2/3;
+    border-radius:6px;
+    padding:16px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:0 18px 38px rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.08);
+    transition:transform .4s var(--ease);
+  }
+  .mini-poster:hover{transform:translateY(-10px) rotate(0deg) !important;z-index:10;}
+  .mini-poster .mp-eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:9px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    opacity:.7;
+  }
+  .mini-poster .mp-title{
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-weight:700;
+    font-size:17px;
+    line-height:1.15;
+  }
+  .mp-1{background:linear-gradient(160deg,#0c0e16,#1c2030);color:#F7F2E7;transform:rotate(-9deg) translate(-78px,8px);}
+  .mp-2{background:linear-gradient(160deg,#2b1117,#4a1c20);color:#F7E9D8;transform:rotate(-2deg) translate(-18px,-26px);z-index:3;}
+  .mp-3{background:linear-gradient(160deg,#1c1c1c,#3a3a3a);color:#F0EFEC;transform:rotate(4deg) translate(40px,18px);z-index:2;}
+  .mp-4{background:linear-gradient(160deg,#10131e,#1d2236);color:#F7F2E7;transform:rotate(10deg) translate(96px,-12px);z-index:1;}
+
+  @media (max-width:980px){
+    .hero__inner{grid-template-columns:1fr;text-align:left;}
+    .hero{padding-top:124px;}
+    .hero__posters{
+      display:flex;
+      position:static;
+      height:auto;
+      justify-content:flex-start;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x mandatory;
+      gap:14px;
+      padding:6px 4px 14px;
+      margin-top:28px;
+    }
+    .hero__posters::-webkit-scrollbar{display:none;}
+    .mini-poster{
+      position:static !important;
+      transform:none !important;
+      width:128px;
+      flex-shrink:0;
+      scroll-snap-align:start;
+    }
+    .mini-poster:hover{transform:none !important;}
+  }
+  @media (max-width:480px){
+    .hero{padding-top:112px;padding-bottom:56px;}
+    .hero__actions{flex-direction:column;align-items:stretch;}
+    .hero__actions .btn{width:100%;}
+  }
+
+  /* ============ CONCEPT CARDS ============ */
+  .heading-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:20px;
+    margin-bottom:48px;
+  }
+  .heading-row h2{font-size:clamp(28px,3.6vw,42px);}
+
+  .concept-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+  }
+  .concept-card{
+    background:var(--cream);
+    border:1px solid rgba(26,29,41,0.07);
+    border-radius:10px;
+    padding:28px 24px;
+  }
+  .concept-icon{
+    width:42px;height:42px;
+    border-radius:50%;
+    background:var(--navy-deep);
+    color:var(--gold-light);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:20px;
+  }
+  .concept-icon svg{width:21px;height:21px;}
+  .concept-card h3{font-size:18px;margin-bottom:10px;}
+  .concept-card p{font-size:14.5px;color:var(--ink-soft);}
+
+  @media (max-width:980px){
+    .concept-grid{
+      display:flex;
+      grid-template-columns:none;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x mandatory;
+      gap:16px;
+      margin:0 -24px;
+      padding:4px 24px 10px;
+    }
+    .concept-grid::-webkit-scrollbar{display:none;}
+    .concept-card{
+      flex:0 0 78%;
+      max-width:300px;
+      scroll-snap-align:start;
+    }
+  }
+  @media (max-width:480px){
+    .concept-card{flex:0 0 84%;}
+  }
+
+  /* ============ COMMENT CA MARCHE ============ */
+  .how{background:var(--navy-deep);color:var(--cream);position:relative;}
+  .how__grid-bg{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(247,242,231,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(247,242,231,0.04) 1px, transparent 1px);
+    background-size:42px 42px;
+  }
+  .how__inner{position:relative;}
+  .steps{
+    position:relative;
+    max-width:680px;
+    margin:0 auto;
+  }
+  .steps::before{
+    content:'';
+    position:absolute;
+    left:25px;top:14px;bottom:14px;
+    width:1px;
+    background-image:linear-gradient(to bottom, rgba(232,163,61,0.55) 0 8px, transparent 8px 16px);
+    background-size:1px 16px;
+  }
+  .step{
+    position:relative;
+    display:flex;
+    gap:24px;
+    padding-bottom:44px;
+  }
+  .step:last-child{padding-bottom:0;}
+  .step__badge{
+    flex-shrink:0;
+    width:50px;height:50px;
+    border-radius:50%;
+    background:var(--navy-deep);
+    border:1.5px solid var(--gold);
+    color:var(--gold-light);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    position:relative;
+    z-index:1;
+  }
+  .step__badge svg{width:20px;height:20px;}
+  .step__num{
+    position:absolute;
+    top:-8px;right:-8px;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--gold);
+    color:var(--ink);
+    font-size:10.5px;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step h3{font-size:18.5px;margin-bottom:6px;color:var(--cream);}
+  .step p{font-size:14.5px;color:var(--cream-soft);max-width:420px;}
+
+  @media (max-width:980px){
+    .steps::before{display:none;}
+    .steps{
+      display:flex;
+      max-width:none;
+      margin:0 -24px;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x mandatory;
+      gap:16px;
+      padding:4px 24px 10px;
+    }
+    .steps::-webkit-scrollbar{display:none;}
+    .step{
+      flex:0 0 78%;
+      max-width:300px;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:16px;
+      padding:24px 22px 26px;
+      background:rgba(247,242,231,0.045);
+      border:1px solid rgba(247,242,231,0.1);
+      border-radius:16px;
+      scroll-snap-align:start;
+    }
+    .step:last-child{padding-bottom:26px;}
+    .step p{max-width:none;}
+  }
+  @media (max-width:480px){
+    .step{flex:0 0 84%;}
+  }
+
+  .how__closing{
+    text-align:center;
+    margin-top:56px;
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-size:clamp(19px,2.4vw,26px);
+    font-weight:700;
+    color:var(--gold-light);
+    letter-spacing:.01em;
+  }
+  .how__closing .stud{margin:0 12px;color:rgba(247,242,231,0.3);}
+
+  @media (max-width:480px){
+    .how__closing{font-size:18px;}
+    .how__closing .stud{margin:0 7px;}
+  }
+
+  /* ============ SETS GALLERY ============ */
+  .filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:40px;
+  }
+  @media (max-width:700px){
+    .filters{
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      margin:0 -24px 32px;
+      padding:0 24px 6px;
+    }
+    .filters::-webkit-scrollbar{display:none;}
+    .filter-pill{flex-shrink:0;}
+  }
+  .filter-pill{
+    padding:9px 18px;
+    border-radius:var(--radius-pill);
+    font-size:13.5px;
+    font-weight:600;
+    border:1.5px solid rgba(26,29,41,0.14);
+    color:var(--ink-soft);
+    transition:all .2s;
+  }
+  .filter-pill:hover{border-color:var(--ink);color:var(--ink);}
+  .filter-pill.is-active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--cream);
+  }
+
+  .sets-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:28px;
+  }
+  .set-card{
+    background:var(--cream);
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid rgba(26,29,41,0.07);
+    transition:transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .set-card:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(26,29,41,0.12);}
+  .set-poster{
+    position:relative;
+    aspect-ratio:4/3;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    color:#F7F2E7;
+  }
+  .set-poster::before,.set-poster::after{
+    content:'';
+    position:absolute;
+    top:50%;
+    width:18px;height:18px;
+    border-radius:50%;
+    background:var(--cream);
+    transform:translateY(-50%);
+  }
+  .set-poster::before{left:-9px;}
+  .set-poster::after{right:-9px;}
+  .set-poster .sp-eyebrow{
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    opacity:.75;
+  }
+  .set-poster .sp-title{
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-weight:700;
+    font-size:24px;
+    line-height:1.1;
+  }
+  .set-poster .sp-tagline{
+    font-size:13px;
+    opacity:.8;
+    margin-top:6px;
+    font-style:italic;
+  }
+
+  [data-universe="star-wars"] .set-poster{background:linear-gradient(165deg,#0c0e16,#1c2030);}
+  [data-universe="harry-potter"] .set-poster{background:linear-gradient(165deg,#2b1117,#4a1c20);}
+  [data-universe="technic"] .set-poster{background:linear-gradient(165deg,#1c1c1c,#3a3a3a);}
+  [data-universe="icons"] .set-poster{background:linear-gradient(165deg,#241a0c,#4a371a);}
+  [data-universe="lotr"] .set-poster{background:linear-gradient(165deg,#101a14,#1f3325);}
+  [data-universe="architecture"] .set-poster{background:linear-gradient(165deg,#11151c,#27313f);}
+
+  .set-meta{
+    padding:18px 22px 22px;
+    border-top:1px dashed rgba(26,29,41,0.15);
+  }
+  .set-meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .set-tag{
+    display:inline-block;
+    background:rgba(232,163,61,0.16);
+    color:#9c6a1c;
+    padding:3px 10px;
+    border-radius:var(--radius-pill);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:11.5px;
+  }
+
+  @media (max-width:980px){.sets-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:640px){.sets-grid{grid-template-columns:1fr;}}
+
+  /* ============ A PROPOS ============ */
+  .about__inner{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:60px;
+    align-items:start;
+  }
+  .about__text p{margin-bottom:18px;color:var(--ink-soft);font-size:16px;}
+  .about__text p strong{color:var(--ink);}
+  .about__lead{
+    font-size:19px !important;
+    color:var(--ink) !important;
+    font-weight:500;
+  }
+
+  .trust-card{
+    background:var(--navy-deep);
+    color:var(--cream);
+    border-radius:14px;
+    padding:32px;
+  }
+  .trust-card h4{
+    font-size:13px;
+    font-family:'Space Mono',monospace;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    margin-bottom:20px;
+  }
+  .trust-list{display:flex;flex-direction:column;gap:16px;}
+  .trust-list li{display:flex;align-items:center;gap:12px;font-size:14.5px;}
+  .trust-list svg{width:18px;height:18px;flex-shrink:0;color:var(--gold);}
+  .trust-card p.trust-note{
+    margin-top:22px;
+    padding-top:20px;
+    border-top:1px solid var(--navy-line);
+    font-size:13px;
+    color:var(--cream-soft);
+  }
+
+  @media (max-width:900px){.about__inner{grid-template-columns:1fr;}}
+
+  /* ============ FAQ ============ */
+  .faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+  .faq-item{
+    background:var(--cream);
+    border:1px solid rgba(26,29,41,0.08);
+    border-radius:10px;
+    padding:4px 22px;
+  }
+  .faq-item summary{
+    cursor:pointer;
+    list-style:none;
+    padding:18px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:600;
+    font-size:15.5px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary .icon{
+    width:22px;height:22px;
+    border-radius:50%;
+    border:1.5px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    margin-left:16px;
+    position:relative;
+  }
+  .faq-item summary .icon::before,.faq-item summary .icon::after{
+    content:'';position:absolute;
+    background:var(--ink);
+    transition:transform .25s;
+  }
+  .faq-item summary .icon::before{width:9px;height:1.4px;}
+  .faq-item summary .icon::after{width:1.4px;height:9px;}
+  .faq-item[open] summary .icon::after{transform:rotate(90deg) scaleY(0);}
+  .faq-item p{padding-bottom:20px;font-size:14.5px;color:var(--ink-soft);max-width:600px;}
+
+  /* ============ FOOTER ============ */
+  .footer{
+    background:var(--navy-deep);
+    color:var(--cream-soft);
+    padding:64px 0 28px;
+  }
+  .footer__top{
+    display:flex;
+    justify-content:space-between;
+    gap:40px;
+    flex-wrap:wrap;
+    padding-bottom:40px;
+    border-bottom:1px solid var(--navy-line);
+  }
+  .footer__brand .brand{margin-bottom:12px;}
+  .footer__brand p{max-width:280px;font-size:14px;}
+  .footer__cols{display:flex;gap:56px;flex-wrap:wrap;}
+  .footer__col h5{
+    font-family:'Space Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    margin-bottom:16px;
+  }
+  .footer__col ul{display:flex;flex-direction:column;gap:10px;font-size:14px;}
+  .footer__col a:hover{color:var(--cream);}
+  .footer__bottom{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    padding-top:24px;
+    font-size:12.5px;
+    color:rgba(247,242,231,0.45);
+  }
+  .footer__bottom p{max-width:640px;}
+
+  @media (max-width:560px){
+    .footer{padding:48px 0 max(24px, env(safe-area-inset-bottom));}
+    .footer__top{flex-direction:column;gap:32px;padding-bottom:32px;}
+    .footer__cols{gap:32px;}
+    .footer__bottom{flex-direction:column;gap:10px;}
+  }
+
+  /* ============ REVEAL ANIM ============ */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease), transform .6s var(--ease);}
+  .reveal.is-visible{opacity:1;transform:none;}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none;}
+    .mini-poster,.set-card,.btn{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="header" id="header">
+  <div class="container header__inner">
+    <a href="#hero" class="brand">Brick<span class="brand__flix">Flix<i class="brand__dot"></i></span></a>
+    <nav class="nav" id="nav">
+      <a href="#sets">Les sets</a>
+      <a href="#comment">Comment ça marche</a>
+      <a href="#apropos">À propos</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn--gold btn--sm header__cta" href="https://locabriques.fr/shops/brickflix" target="_blank" rel="noopener">Louer un set</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
+  </div>
+  <div class="nav-backdrop" id="navBackdrop"></div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero">
+    <div class="hero__grid"></div>
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <p class="eyebrow eyebrow--dark">Location de sets LEGO® premium</p>
+        <h1 class="hero__title">Construisez les plus grands sets LEGO® <span class="text-gold">sans les acheter.</span></h1>
+        <p class="hero__sub">BrickFlix vous permet de louer des sets LEGO® d'exception, de les construire chez vous puis de les retourner une fois l'aventure terminée.</p>
+        <div class="hero__actions">
+          <a href="#sets" class="btn btn--gold">Découvrir les sets</a>
+          <a href="#comment" class="btn btn--ghost">Comment ça marche ?</a>
+        </div>
+      </div>
+      <div class="hero__posters">
+        <div class="mini-poster mp-1">
+          <span class="mp-eyebrow">Seigneur des Anneaux</span>
+          <span class="mp-title">Rivendell</span>
+        </div>
+        <div class="mini-poster mp-2">
+          <span class="mp-eyebrow">Harry Potter</span>
+          <span class="mp-title">Château de Poudlard</span>
+        </div>
+        <div class="mini-poster mp-3">
+          <span class="mp-eyebrow">Technic</span>
+          <span class="mp-title">Ferrari Daytona SP3</span>
+        </div>
+        <div class="mini-poster mp-4">
+          <span class="mp-eyebrow">Star Wars</span>
+          <span class="mp-title">Faucon Millenium</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONCEPT ============ -->
+  <section id="concept">
+    <div class="container">
+      <div class="heading-row reveal">
+        <div>
+          <p class="eyebrow">Le concept</p>
+          <h2>Pourquoi louer un set LEGO® ?</h2>
+        </div>
+      </div>
+      <div class="concept-grid">
+        <div class="concept-card reveal">
+          <div class="concept-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c0 1 1 1.8 2.5 1.8s2.5-.8 2.5-1.9c0-2.6-5-1.4-5-4 0-1.1 1-1.9 2.5-1.9s2.5.8 2.5 1.8"/><path d="M12 6.2v1.1M12 16.7v1.1"/></svg>
+          </div>
+          <h3>Économique</h3>
+          <p>Profitez de sets valant plusieurs centaines d'euros pour une fraction du prix.</p>
+        </div>
+        <div class="concept-card reveal">
+          <div class="concept-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4c-7 0-13 4-14.5 11C5 17 6 19 8 19c7 0 12-5 13-11 .3-1.8 0-4-1-4Z"/><path d="M6 18c2-4 5-7 9-9"/></svg>
+          </div>
+          <h3>Écologique</h3>
+          <p>Un même set fait le bonheur de plusieurs passionnés.</p>
+        </div>
+        <div class="concept-card reveal">
+          <div class="concept-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5 12 4l8.5 4.5L12 13Z"/><path d="M3.5 8.5V16L12 20.5 20.5 16V8.5"/><path d="M12 13v7.5"/></svg>
+          </div>
+          <h3>Zéro encombrement</h3>
+          <p>Construisez, exposez puis renvoyez le set lorsque vous avez terminé.</p>
+        </div>
+        <div class="concept-card reveal">
+          <div class="concept-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11.5a3.5 3.5 0 1 1 0 7H4"/><path d="M7 5 4 8l3 3"/><path d="M20 16H8.5a3.5 3.5 0 1 1 0-7H20"/><path d="M17 19l3-3-3-3"/></svg>
+          </div>
+          <h3>Variété infinie</h3>
+          <p>Découvrez régulièrement de nouveaux univers sans multiplier les achats.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMMENT CA MARCHE ============ -->
+  <section class="how" id="comment">
+    <div class="how__grid-bg"></div>
+    <div class="container how__inner">
+      <div class="heading-row reveal" style="border:none;">
+        <div>
+          <p class="eyebrow eyebrow--dark">Le processus</p>
+          <h2>Comment ça marche ?</h2>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step__badge">
+            <span class="step__num">1</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5 12 4l8.5 4.5L12 13Z"/><path d="M3.5 8.5V16L12 20.5 20.5 16V8.5"/></svg>
+          </div>
+          <div>
+            <h3>Préparation &amp; expédition</h3>
+            <p>Nous préparons soigneusement le set avant son départ.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step__badge">
+            <span class="step__num">2</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+          </div>
+          <div>
+            <h3>Construisez et profitez</h3>
+            <p>Vivez l'expérience LEGO® telle qu'elle a été imaginée.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step__badge">
+            <span class="step__num">3</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7" width="17" height="13" rx="1.2"/><path d="M3.5 7 12 13l8.5-6"/></svg>
+          </div>
+          <div>
+            <h3>Retour du set</h3>
+            <p>Lorsque votre construction est terminée, renvoyez simplement le set.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step__badge">
+            <span class="step__num">4</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.2 15.2 20 20"/></svg>
+          </div>
+          <div>
+            <h3>Contrôle et reconditionnement</h3>
+            <p>Nous vérifions les pièces et reconstituons les sachets.</p>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step__badge">
+            <span class="step__num">5</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h11.5a3.5 3.5 0 1 1 0 7H4"/><path d="M7 5 4 8l3 3"/><path d="M20 16H8.5a3.5 3.5 0 1 1 0-7H20"/><path d="M17 19l3-3-3-3"/></svg>
+          </div>
+          <div>
+            <h3>Prêt pour un nouveau passionné</h3>
+            <p>Le set est prêt à repartir pour une nouvelle aventure.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="how__closing reveal">Construisez<span class="stud">●</span>Profitez<span class="stud">●</span>Partagez<span class="stud">●</span>Recommencez.</p>
+    </div>
+  </section>
+
+  <!-- ============ SETS GALLERY ============ -->
+  <section id="sets">
+    <div class="container">
+      <div class="heading-row reveal">
+        <div>
+          <p class="eyebrow">Le catalogue</p>
+          <h2>Découvrez nos sets</h2>
+        </div>
+      </div>
+
+      <div class="filters reveal" id="filters"></div>
+      <div class="sets-grid" id="setsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ A PROPOS ============ -->
+  <section id="apropos">
+    <div class="container about__inner">
+      <div class="about__text reveal">
+        <p class="eyebrow">Qui sommes-nous</p>
+        <h2 style="margin-bottom:24px;">Deux passionnés, une idée simple.</h2>
+        <p class="about__lead">Nous sommes deux passionnés de LEGO® convaincus que les plus beaux sets méritent d'être construits par le plus grand nombre.</p>
+        <p>BrickFlix est né d'une question simple : <strong>pourquoi acheter un set à plusieurs centaines d'euros pour ne le construire qu'une seule fois ?</strong> Nous avons donc décidé de proposer une alternative plus économique, plus écologique et sans encombrement.</p>
+        <p>Notre mission est de permettre à chacun de vivre l'expérience des plus grands sets LEGO®, sans les contraintes liées à l'achat.</p>
+      </div>
+
+      <div class="trust-card reveal">
+        <h4>Gestion des réservations</h4>
+        <p style="font-size:14.5px;margin-bottom:20px;">Pour garantir une expérience simple et sécurisée, nous nous appuyons sur notre partenaire <strong style="color:var(--gold-light);">Locabriques</strong> pour la gestion de :</p>
+        <ul class="trust-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Réservations</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Paiements</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Cautions</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg> Suivi des commandes</li>
+        </ul>
+        <p class="trust-note">Cela permet à nos clients de bénéficier d'un processus fiable et sécurisé, de la réservation jusqu'au retour du set.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq">
+    <div class="container">
+      <div class="heading-row reveal" style="justify-content:center;text-align:center;">
+        <div style="width:100%;">
+          <p class="eyebrow" style="justify-content:center;">Questions fréquentes</p>
+          <h2>FAQ</h2>
+        </div>
+      </div>
+      <div class="faq-list reveal">
+        <details class="faq-item">
+          <summary>Les sets sont-ils complets ? <span class="icon"></span></summary>
+          <p>Oui, chaque set est contrôlé avant expédition.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Que se passe-t-il s'il manque une pièce ? <span class="icon"></span></summary>
+          <p>Nous trouvons une solution rapidement avec vous.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Combien de temps puis-je garder un set ? <span class="icon"></span></summary>
+          <p>La durée dépend de l'offre choisie lors de la réservation.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Comment réserver ? <span class="icon"></span></summary>
+          <p>Cliquez simplement sur « Louer ce set » pour accéder à notre plateforme partenaire.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="#hero" class="brand">Brick<span class="brand__flix">Flix<i class="brand__dot"></i></span></a>
+        <p>La location de sets LEGO® premium. Construisez, exposez, renvoyez.</p>
+      </div>
+      <div class="footer__cols">
+        <div class="footer__col">
+          <h5>Navigation</h5>
+          <ul>
+            <li><a href="#sets">Les sets</a></li>
+            <li><a href="#comment">Comment ça marche</a></li>
+            <li><a href="#apropos">À propos</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h5>Réservation</h5>
+          <ul>
+            <li><a href="https://locabriques.fr/shops/brickflix" target="_blank" rel="noopener">Plateforme Locabriques ↗</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>LEGO® est une marque déposée du groupe LEGO, qui ne sponsorise, n'autorise ni n'approuve ce site. Les réservations, paiements et cautions sont gérés par notre partenaire Locabriques.</p>
+      <p>© <span id="year"></span> BrickFlix. Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // =====================================================
+  // CATALOGUE DE SETS — pour ajouter un set, dupliquez un
+  // objet ci-dessous et modifiez ses valeurs. Univers
+  // possibles : star-wars, harry-potter, technic, icons,
+  // lotr, architecture (ou un nouveau, en l'ajoutant aussi
+  // dans le tableau FILTERS plus bas).
+  // =====================================================
+  const SETS = [
+    { name:"Rivendell", universe:"lotr", universeLabel:"Seigneur des Anneaux", ref:"10316", pieces:"6 167", tagline:"L'asile elfique, pièce par pièce." },
+    { name:"Château de Poudlard", universe:"harry-potter", universeLabel:"Harry Potter", ref:"71043", pieces:"6 020", tagline:"La grande école de magie en briques." },
+    { name:"Ferrari Daytona SP3", universe:"technic", universeLabel:"Technic", ref:"42143", pieces:"3 778", tagline:"La course, sans le moteur." },
+    { name:"Faucon Millenium", universe:"star-wars", universeLabel:"Star Wars", ref:"75192", pieces:"7 541", tagline:"Le vaisseau le plus rapide de la galaxie." },
+    { name:"Tour Eiffel", universe:"icons", universeLabel:"Icons", ref:"10307", pieces:"1 582", tagline:"Paris, à l'échelle d'un salon." },
+    { name:"Empire State Building", universe:"architecture", universeLabel:"Architecture", ref:"21046", pieces:"1 767", tagline:"New York, version brique." }
+  ];
+
+  const FILTERS = [
+    { key:"all", label:"Tous" },
+    { key:"star-wars", label:"Star Wars" },
+    { key:"harry-potter", label:"Harry Potter" },
+    { key:"technic", label:"Technic" },
+    { key:"icons", label:"Icons" },
+    { key:"lotr", label:"Seigneur des Anneaux" },
+    { key:"architecture", label:"Architecture" }
+  ];
+
+  const RENT_URL = "https://locabriques.fr/shops/brickflix";
+
+  function renderFilters(){
+    const wrap = document.getElementById('filters');
+    wrap.innerHTML = FILTERS.map((f,i)=>
+      `<button class="filter-pill${i===0?' is-active':''}" data-filter="${f.key}">${f.label}</button>`
+    ).join('');
+    wrap.addEventListener('click', e=>{
+      const btn = e.target.closest('.filter-pill');
+      if(!btn) return;
+      wrap.querySelectorAll('.filter-pill').forEach(b=>b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      renderSets(btn.dataset.filter);
+    });
+  }
+
+  function renderSets(filter){
+    const grid = document.getElementById('setsGrid');
+    const list = filter === 'all' ? SETS : SETS.filter(s=>s.universe===filter);
+    grid.innerHTML = list.map(s=>`
+      <div class="set-card" data-universe="${s.universe}">
+        <div class="set-poster">
+          <span class="sp-eyebrow">${s.universeLabel}</span>
+          <div>
+            <div class="sp-title">${s.name}</div>
+            <div class="sp-tagline">${s.tagline}</div>
+          </div>
+        </div>
+        <div class="set-meta">
+          <div class="set-meta-row">
+            <span>RÉF. ${s.ref}</span>
+            <span>${s.pieces} PCS</span>
+          </div>
+          <a class="btn btn--dark btn--block" href="${RENT_URL}" target="_blank" rel="noopener">Louer ce set</a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderFilters();
+  renderSets('all');
+
+  // Header scroll state
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', ()=>{
+    header.classList.toggle('is-scrolled', window.scrollY > 30);
+  });
+
+  // Mobile nav
+  const navToggle = document.getElementById('navToggle');
+  const nav = document.getElementById('nav');
+  const navBackdrop = document.getElementById('navBackdrop');
+
+  function setNavOpen(open){
+    nav.classList.toggle('is-open', open);
+    navBackdrop.classList.toggle('is-visible', open);
+    navToggle.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  navToggle.addEventListener('click', ()=>{
+    setNavOpen(!nav.classList.contains('is-open'));
+  });
+  navBackdrop.addEventListener('click', ()=> setNavOpen(false));
+  nav.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> setNavOpen(false)));
+
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const obs = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){ en.target.classList.add('is-visible'); obs.unobserve(en.target); }
+      });
+    }, { threshold:0.12 });
+    revealEls.forEach(el=>obs.observe(el));
+  } else {
+    revealEls.forEach(el=>el.classList.add('is-visible'));
+  }
+
+  // Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
