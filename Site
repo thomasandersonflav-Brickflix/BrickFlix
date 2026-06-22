@@ -1,0 +1,13 @@
+brickflix-site/
+│
+├── index.html
+├── styles.css
+├── script.js
+├── images/
+│   ├── fondcombe.jpg
+│   ├── faucon-millenium.jpg
+│   ├── ferrari-sp3.jpg
+│   ├── poudlard.jpg
+│   └── sanctum-sanctorum.jpg
+└── data/
+    └── sets.json
